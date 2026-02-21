@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'node:url';
-import { resolve } from 'node:path';
+import { resolve, isAbsolute } from 'node:path';
 
 import { findConfigFile, serverRequire } from 'storybook/internal/common';
 import { logger } from 'storybook/internal/node-logger';
@@ -30,12 +30,16 @@ export const swc: PresetProperty<'swc'> = (config: Record<string, any>): Record<
 };
 
 export async function rspackFinal(config: Configuration, options: Options) {
-  const previewConfigPath = findConfigFile('preview', options.configDir);
+  const rawPreviewConfigPath = findConfigFile('preview', options.configDir);
 
   // If there's no preview file, there's nothing to mock.
-  if (!previewConfigPath) {
+  if (!rawPreviewConfigPath) {
     return config;
   }
+
+  const previewConfigPath = isAbsolute(rawPreviewConfigPath)
+    ? rawPreviewConfigPath
+    : resolve(process.cwd(), rawPreviewConfigPath);
 
   config.plugins = config.plugins || [];
 
