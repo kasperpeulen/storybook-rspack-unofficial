@@ -1,0 +1,21 @@
+{
+  "name": "sandbox",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@rspack/core": "^1.3.0",
+    "@storybook/react": "^10.0.0",
+    "storybook": "^10.0.0",
+    "storybook-react-rspack": "workspace:*",
+    "storybook-builder-rspack": "workspace:*"
+  }
+}
