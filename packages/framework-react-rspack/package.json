@@ -20,6 +20,7 @@
       "default": "./dist/preset.js"
     },
     "./loaders/react-docgen-loader": "./dist/loaders/react-docgen-loader.js",
+    "./loaders/react-docgen-typescript-loader": "./dist/loaders/react-docgen-typescript-loader.js",
     "./package.json": "./package.json"
   },
   "files": [
@@ -38,14 +39,14 @@
     "empathic": "^1.0.0",
     "magic-string": "^0.30.5",
     "react-docgen": "^7.1.1",
+    "react-docgen-typescript": "^2.2.2",
     "resolve": "^1.22.8",
     "tsconfig-paths": "^4.2.0"
   },
   "devDependencies": {
     "@rspack/core": "^1.3.0",
     "@types/resolve": "^1.20.6",
-    "tsup": "^8.0.0",
-    "typescript": "^5.7.0"
+    "tsup": "^8.0.0"
   },
   "peerDependencies": {
     "@rspack/core": "^1.0.0",

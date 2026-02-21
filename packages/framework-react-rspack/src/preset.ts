@@ -20,13 +20,48 @@ export const rspackFinal = async (config: Configuration, options: any): Promise<
   const typescriptOptions = await options.presets.apply('typescript', {} as any);
   const debug = options.loglevel === 'debug';
 
-  const { reactDocgen = 'react-docgen' } = typescriptOptions || {};
+  const { reactDocgen = 'react-docgen', reactDocgenTypescriptOptions } = typescriptOptions || {};
 
   if (!reactDocgen || typeof reactDocgen !== 'string') {
     return config;
   }
 
-  // Only support react-docgen mode (not react-docgen-typescript) for now
+  if (reactDocgen === 'react-docgen-typescript') {
+    return {
+      ...config,
+      module: {
+        ...(config.module ?? {}),
+        rules: [
+          ...(config.module?.rules ?? []),
+          // react-docgen loader for JS/JSX files
+          {
+            test: /\.(cjs|mjs|jsx?)$/,
+            enforce: 'pre' as const,
+            loader: fileURLToPath(
+              import.meta.resolve('storybook-react-rspack/loaders/react-docgen-loader')
+            ),
+            options: { debug },
+            exclude: /(\.(stories|story)\.(js|jsx|ts|tsx))|(node_modules)/,
+          },
+          // react-docgen-typescript loader for TS/TSX files
+          {
+            test: /\.tsx?$/,
+            enforce: 'pre' as const,
+            loader: fileURLToPath(
+              import.meta.resolve('storybook-react-rspack/loaders/react-docgen-typescript-loader')
+            ),
+            options: {
+              savePropValueAsString: true,
+              ...reactDocgenTypescriptOptions,
+            },
+            exclude: /(\.(stories|story)\.(ts|tsx))|(node_modules)/,
+          },
+        ],
+      },
+    };
+  }
+
+  // Default: react-docgen mode
   return {
     ...config,
     module: {
@@ -39,9 +74,7 @@ export const rspackFinal = async (config: Configuration, options: any): Promise<
           loader: fileURLToPath(
             import.meta.resolve('storybook-react-rspack/loaders/react-docgen-loader')
           ),
-          options: {
-            debug,
-          },
+          options: { debug },
           exclude: /(\.(stories|story)\.(js|jsx|ts|tsx))|(node_modules)/,
         },
       ],
