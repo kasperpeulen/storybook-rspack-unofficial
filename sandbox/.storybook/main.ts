@@ -2,7 +2,8 @@ import type { StorybookConfig } from 'storybook-react-rspack';
 
 const config: StorybookConfig = {
   framework: 'storybook-react-rspack',
-  stories: ['../src/**/*.stories.@(ts|tsx|js|jsx)'],
+  stories: ['../src/**/*.mdx', '../src/**/*.stories.@(ts|tsx|js|jsx)'],
+  addons: ['@storybook/addon-docs'],
   async rspackFinal(config) {
     config.resolve ??= {};
     config.resolve.alias = {

@@ -77,6 +77,37 @@ export async function rspack(config: Configuration, options: Options) {
     defaultConfig = await createDefaultRspackConfig(config, options);
   }
 
+  // Pick up webpack preset contributions from addons (e.g. addon-docs adds MDX loader via `webpack` hook).
+  // Many Storybook addons only export `webpack`, not `rspack`, so we merge those rules/plugins.
+  try {
+    const webpackContributions = await presets.apply('webpack', {}, options) as Configuration;
+    if (webpackContributions?.module?.rules) {
+      defaultConfig.module = defaultConfig.module || {};
+      defaultConfig.module.rules = [
+        ...(defaultConfig.module.rules || []),
+        ...webpackContributions.module.rules,
+      ];
+    }
+    if (webpackContributions?.plugins) {
+      defaultConfig.plugins = [
+        ...(defaultConfig.plugins || []),
+        ...webpackContributions.plugins,
+      ];
+    }
+    if (webpackContributions?.resolve) {
+      defaultConfig.resolve = {
+        ...defaultConfig.resolve,
+        ...webpackContributions.resolve,
+        alias: {
+          ...(defaultConfig.resolve?.alias as Record<string, string> || {}),
+          ...(webpackContributions.resolve?.alias as Record<string, string> || {}),
+        },
+      };
+    }
+  } catch {
+    // No webpack contributions from addons — that's fine
+  }
+
   const finalDefaultConfig = await presets.apply('rspackFinal', defaultConfig, options);
 
   // Check whether user has a custom rspack/webpack config file and
