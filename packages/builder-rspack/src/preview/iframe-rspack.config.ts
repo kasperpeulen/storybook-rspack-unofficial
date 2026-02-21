@@ -12,8 +12,6 @@ import type { Options } from 'storybook/internal/types';
 
 import { type BuilderOptions } from '@storybook/core-webpack';
 
-// @ts-expect-error - no types available
-import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin';
 import { dedent } from 'ts-dedent';
 import { rspack as rspackModule } from '@rspack/core';
 import type { Configuration } from '@rspack/core';
@@ -212,7 +210,6 @@ export default async (
         ),
       }),
       isProd ? null : new HotModuleReplacementPlugin(),
-      new CaseSensitivePathsPlugin(),
       quiet ? null : new ProgressPlugin({ modulesCount } as any),
     ].filter(Boolean) as any,
     module: {
