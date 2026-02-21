@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: ['src/index.ts', 'src/preset.ts'],
+  entry: ['src/index.ts', 'src/preset.ts', 'src/loaders/react-docgen-loader.ts'],
   format: ['esm'],
   dts: true,
   outDir: 'dist',
