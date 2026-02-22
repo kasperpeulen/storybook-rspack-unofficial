@@ -1,0 +1,51 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`react-docgen-typescript-loader > DefaultExport.tsx has docgen code generated 1`] = `
+"
+try { DefaultExport.__docgenInfo = {\\"description\\":\\"A simple component.\\",\\"displayName\\":\\"DefaultExport\\",\\"props\\":{\\"color\\":{\\"defaultValue\\":null,\\"description\\":\\"Button color.\\",\\"name\\":\\"color\\",\\"required\\":true,\\"type\\":{\\"name\\":\\"enum\\",\\"value\\":[{\\"value\\":\\"\\\\"blue\\\\"\\"},{\\"value\\":\\"\\\\"green\\\\"\\"}]}}}}; } catch(e) {}"
+`;
+
+exports[`react-docgen-typescript-loader > DefaultExportWithDisplayName.tsx has docgen code generated 1`] = `
+"
+try { DefaultExportComponentWithDisplayName.__docgenInfo = {\\"description\\":\\"A simple component.\\",\\"displayName\\":\\"DefaultExportComponentWithDisplayName\\",\\"props\\":{\\"color\\":{\\"defaultValue\\":null,\\"description\\":\\"Button color.\\",\\"name\\":\\"color\\",\\"required\\":true,\\"type\\":{\\"name\\":\\"enum\\",\\"value\\":[{\\"value\\":\\"\\\\"blue\\\\"\\"},{\\"value\\":\\"\\\\"green\\\\"\\"}]}}}}; } catch(e) {}"
+`;
+
+exports[`react-docgen-typescript-loader > DefaultPropValue.tsx has docgen code generated 1`] = `
+"
+try { DefaultPropValueComponent.__docgenInfo = {\\"description\\":\\"Component with a prop with a default value.\\",\\"displayName\\":\\"DefaultPropValueComponent\\",\\"props\\":{\\"color\\":{\\"defaultValue\\":{\\"value\\":\\"blue\\"},\\"description\\":\\"Button color.\\",\\"name\\":\\"color\\",\\"required\\":true,\\"type\\":{\\"name\\":\\"enum\\",\\"value\\":[{\\"value\\":\\"\\\\"blue\\\\"\\"},{\\"value\\":\\"\\\\"green\\\\"\\"}]}},\\"counter\\":{\\"defaultValue\\":{\\"value\\":\\"123\\"},\\"description\\":\\"Button counter.\\",\\"name\\":\\"counter\\",\\"required\\":false,\\"type\\":{\\"name\\":\\"number\\"}},\\"disabled\\":{\\"defaultValue\\":{\\"value\\":\\"false\\"},\\"description\\":\\"Button disabled.\\",\\"name\\":\\"disabled\\",\\"required\\":false,\\"type\\":{\\"name\\":\\"boolean\\"}}}}; } catch(e) {}"
+`;
+
+exports[`react-docgen-typescript-loader > HyphenatedPropName.tsx has docgen code generated 1`] = `
+"
+try { HyphenatedPropNameComponent.__docgenInfo = {\\"description\\":\\"A component with a hyphenated prop name.\\",\\"displayName\\":\\"HyphenatedPropNameComponent\\",\\"props\\":{\\"button-color\\":{\\"defaultValue\\":null,\\"description\\":\\"Button color.\\",\\"name\\":\\"button-color\\",\\"required\\":true,\\"type\\":{\\"name\\":\\"enum\\",\\"value\\":[{\\"value\\":\\"\\\\"blue\\\\"\\"},{\\"value\\":\\"\\\\"green\\\\"\\"}]}}}}; } catch(e) {}"
+`;
+
+exports[`react-docgen-typescript-loader > MultiProps.tsx has docgen code generated 1`] = `
+"
+try { MultiPropsComponent.__docgenInfo = {\\"description\\":\\"This is a component with multiple props.\\",\\"displayName\\":\\"MultiPropsComponent\\",\\"props\\":{\\"color\\":{\\"defaultValue\\":null,\\"description\\":\\"Button color.\\",\\"name\\":\\"color\\",\\"required\\":true,\\"type\\":{\\"name\\":\\"enum\\",\\"value\\":[{\\"value\\":\\"\\\\"blue\\\\"\\"},{\\"value\\":\\"\\\\"green\\\\"\\"}]}},\\"size\\":{\\"defaultValue\\":null,\\"description\\":\\"Button size.\\",\\"name\\":\\"size\\",\\"required\\":true,\\"type\\":{\\"name\\":\\"enum\\",\\"value\\":[{\\"value\\":\\"\\\\"small\\\\"\\"},{\\"value\\":\\"\\\\"large\\\\"\\"}]}}}}; } catch(e) {}"
+`;
+
+exports[`react-docgen-typescript-loader > MultilineDescription.tsx has docgen code generated 1`] = `
+"
+try { MultilineDescriptionComponent.__docgenInfo = {\\"description\\":\\"A component with a multiline description.\\n\\nSecond line.\\",\\"displayName\\":\\"MultilineDescriptionComponent\\",\\"props\\":{\\"color\\":{\\"defaultValue\\":null,\\"description\\":\\"Button color.\\",\\"name\\":\\"color\\",\\"required\\":true,\\"type\\":{\\"name\\":\\"enum\\",\\"value\\":[{\\"value\\":\\"\\\\"blue\\\\"\\"},{\\"value\\":\\"\\\\"green\\\\"\\"}]}}}}; } catch(e) {}"
+`;
+
+exports[`react-docgen-typescript-loader > MultilinePropDescription.tsx has docgen code generated 1`] = `
+"
+try { MultilinePropDescriptionComponent.__docgenInfo = {\\"description\\":\\"A component with multiline prop description.\\",\\"displayName\\":\\"MultilinePropDescriptionComponent\\",\\"props\\":{\\"color\\":{\\"defaultValue\\":null,\\"description\\":\\"This is a multiline prop description.\\n\\nSecond line.\\",\\"name\\":\\"color\\",\\"required\\":true,\\"type\\":{\\"name\\":\\"enum\\",\\"value\\":[{\\"value\\":\\"\\\\"blue\\\\"\\"},{\\"value\\":\\"\\\\"green\\\\"\\"}]}}}}; } catch(e) {}"
+`;
+
+exports[`react-docgen-typescript-loader > Simple.tsx has docgen code generated 1`] = `
+"
+try { SimpleComponent.__docgenInfo = {\\"description\\":\\"A simple component.\\",\\"displayName\\":\\"SimpleComponent\\",\\"props\\":{\\"color\\":{\\"defaultValue\\":null,\\"description\\":\\"Button color.\\",\\"name\\":\\"color\\",\\"required\\":true,\\"type\\":{\\"name\\":\\"enum\\",\\"value\\":[{\\"value\\":\\"\\\\"blue\\\\"\\"},{\\"value\\":\\"\\\\"green\\\\"\\"}]}}}}; } catch(e) {}"
+`;
+
+exports[`react-docgen-typescript-loader > SimpleWithDisplayName.tsx has docgen code generated 1`] = `
+"
+try { SimpleComponentWithDisplayName.__docgenInfo = {\\"description\\":\\"A simple component.\\",\\"displayName\\":\\"SimpleComponentWithDisplayName\\",\\"props\\":{\\"color\\":{\\"defaultValue\\":null,\\"description\\":\\"Button color.\\",\\"name\\":\\"color\\",\\"required\\":true,\\"type\\":{\\"name\\":\\"enum\\",\\"value\\":[{\\"value\\":\\"\\\\"blue\\\\"\\"},{\\"value\\":\\"\\\\"green\\\\"\\"}]}}}}; } catch(e) {}"
+`;
+
+exports[`react-docgen-typescript-loader > TextOnlyComponent.tsx has docgen code generated 1`] = `
+"
+try { SimpleComponent.__docgenInfo = {\\"description\\":\\"A component with only text content wrapped in a div.\\n\\nRef: https://github.com/strothj/react-docgen-typescript-loader/issues/7\\",\\"displayName\\":\\"SimpleComponent\\",\\"props\\":{}}; } catch(e) {}"
+`;
