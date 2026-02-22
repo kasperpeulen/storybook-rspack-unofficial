@@ -26,7 +26,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     setupFiles: ['./vitest-setup.ts'],
-    include: ['packages/**/*.test.{ts,tsx}'],
+    include: ['packages/**/*.test.{ts,tsx}', 'sandbox/tests/**/*.test.{ts,tsx}'],
     exclude: ['**/node_modules/**', '**/dist/**', 'storybook-source/**', 'storybook-rsbuild-source/**'],
   },
 });
