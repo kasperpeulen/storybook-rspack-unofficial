@@ -12,7 +12,7 @@ export const core: PresetProperty<'core'> = async (config, options) => {
       name: 'storybook-builder-rspack',
       options: (typeof framework === 'object' ? framework?.options?.builder : {}) || {},
     },
-    renderer: '@storybook/react',
+    renderer: fileURLToPath(import.meta.resolve('@storybook/react/preset')),
   };
 };
 
