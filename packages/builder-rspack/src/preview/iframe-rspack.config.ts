@@ -213,8 +213,6 @@ export default async (
       quiet ? null : new ProgressPlugin({ modulesCount } as any),
     ].filter(Boolean) as any,
     module: {
-      // Disable warning for dynamic requires
-      unknownContextCritical: false,
       rules: [
         {
           test: /\.(ts|tsx)$/,
