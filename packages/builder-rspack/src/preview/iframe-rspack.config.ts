@@ -19,8 +19,32 @@ import type { Configuration } from '@rspack/core';
 import type { TypescriptOptions } from '../types';
 import { getVirtualModules } from './virtual-module-mapping';
 
-const { DefinePlugin, HotModuleReplacementPlugin, ProgressPlugin, HtmlRspackPlugin } =
-  rspackModule;
+const { DefinePlugin, HotModuleReplacementPlugin, ProgressPlugin } = rspackModule;
+
+class IframeHtmlPlugin {
+  constructor(
+    private filename: string,
+    private generate: (files: { css: string[]; js: string[] }) => string
+  ) {}
+
+  apply(compiler: any) {
+    compiler.hooks.compilation.tap('IframeHtmlPlugin', (compilation: any) => {
+      compilation.hooks.processAssets.tap(
+        {
+          name: 'IframeHtmlPlugin',
+          stage: rspackModule.Compilation.PROCESS_ASSETS_STAGE_REPORT,
+        },
+        () => {
+          const assetNames = Object.keys(compilation.assets);
+          const css = assetNames.filter((n) => n.endsWith('.css'));
+          const js = assetNames.filter((n) => n.endsWith('.js'));
+          const html = this.generate({ css, js });
+          compilation.emitAsset(this.filename, new rspackModule.sources.RawSource(html));
+        }
+      );
+    });
+  }
+}
 
 export default async (
   options: Options & { typescriptOptions: TypescriptOptions }
@@ -135,45 +159,42 @@ export default async (
       Object.keys(virtualModuleMapping).length > 0
         ? new rspackModule.experiments.VirtualModulesPlugin(virtualModuleMapping)
         : (null as any),
-      new HtmlRspackPlugin({
-        filename: `iframe.html`,
-        inject: false,
-        scriptLoading: 'module',
-        templateContent: ({ htmlRspackPlugin }: any) => {
-          const globals: Record<string, any> = {
-            CONFIG_TYPE: configType,
-            LOGLEVEL: logLevel,
-            FRAMEWORK_OPTIONS: frameworkOptions,
-            CHANNEL_OPTIONS: (coreOptions as any).channelOptions,
-            FEATURES: features,
-            PREVIEW_URL: previewUrl,
-            STORIES: stories.map((specifier: any) => ({
-              ...specifier,
-              importPathMatcher: specifier.importPathMatcher.source,
-            })),
-            DOCS_OPTIONS: docsOptions,
-            TAGS_OPTIONS: tagsOptions,
-            ...((build as any)?.test?.disableBlocks
-              ? { __STORYBOOK_BLOCKS_EMPTY_MODULE__: {} }
-              : {}),
-          };
+      new IframeHtmlPlugin('iframe.html', ({ css, js }) => {
+        const globals: Record<string, any> = {
+          CONFIG_TYPE: configType,
+          LOGLEVEL: logLevel,
+          FRAMEWORK_OPTIONS: frameworkOptions,
+          CHANNEL_OPTIONS: (coreOptions as any).channelOptions,
+          FEATURES: features,
+          PREVIEW_URL: previewUrl,
+          STORIES: stories.map((specifier: any) => ({
+            ...specifier,
+            importPathMatcher: specifier.importPathMatcher.source,
+          })),
+          DOCS_OPTIONS: docsOptions,
+          TAGS_OPTIONS: tagsOptions,
+          ...((build as any)?.test?.disableBlocks
+            ? { __STORYBOOK_BLOCKS_EMPTY_MODULE__: {} }
+            : {}),
+        };
 
-          const cssLinks = (htmlRspackPlugin?.files?.css ?? [])
-            .map((file: string) => `<link href="${file}" rel="stylesheet" />`)
-            .join('\n    ');
+        const cssLinks = css
+          .map((file) => `<link href="${file}" rel="stylesheet" />`)
+          .join('\n    ');
 
-          const jsImports = (htmlRspackPlugin?.files?.js ?? [])
-            .map((file: string) => `import './${file}';`)
-            .join('\n      ');
+        const jsImports = js
+          .map((file) => `import './${file}';`)
+          .join('\n      ');
 
-          const globalsScript = Object.keys(globals).length > 0
+        const globalsScript =
+          Object.keys(globals).length > 0
             ? `<script>\n${Object.entries(globals)
                 .filter(([, v]) => v != null)
                 .map(([k, v]) => `      window['${k}'] = ${JSON.stringify(v)};`)
                 .join('\n')}\n    </script>`
             : '';
 
-          return `<!DOCTYPE html>
+        return `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -199,8 +220,6 @@ export default async (
     </script>
   </body>
 </html>`;
-        },
-        minify: isProd,
       }),
       new DefinePlugin({
         'process.env': `(${JSON.stringify(envs)})`,
