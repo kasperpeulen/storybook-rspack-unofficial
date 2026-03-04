@@ -37,7 +37,7 @@ class IframeHtmlPlugin {
         () => {
           const assetNames = Object.keys(compilation.assets);
           const css = assetNames.filter((n) => n.endsWith('.css'));
-          const js = assetNames.filter((n) => n.endsWith('.js'));
+          const js = assetNames.filter((n) => n.endsWith('.js') && !n.includes('.hot-update.'));
           const html = this.generate({ css, js });
           compilation.emitAsset(this.filename, new rspackModule.sources.RawSource(html));
         }
@@ -128,6 +128,7 @@ export default async (
   return {
     name: 'preview',
     mode: isProd ? 'production' : 'development',
+    target: 'web',
     bail: isProd,
     devtool: (options as any).build?.test?.disableSourcemaps ? false : 'cheap-module-source-map',
     entry: [...(entries ?? []), ...dynamicEntries],
@@ -135,6 +136,9 @@ export default async (
       path: resolve(process.cwd(), outputDir),
       filename: isProd ? '[name].[contenthash:8].iframe.bundle.js' : '[name].iframe.bundle.js',
       publicPath: '',
+      // Pin to a stable name so the HMR function (webpackHotUpdate<uniqueName>)
+      // never changes between builds regardless of the project's package.json name.
+      uniqueName: 'storybookPreview',
     },
     stats: {
       preset: 'none',
@@ -315,7 +319,11 @@ export default async (
       splitChunks: {
         chunks: 'all' as const,
       },
-      runtimeChunk: true,
+      // Separate runtime chunk breaks rspack HMR: the runtime chunk ends up in
+      // the hot-update manifest and applying it requires webpackHotUpdate* which
+      // lives inside the runtime itself (circular). Keep runtime embedded in the
+      // entry chunk in dev; extract it only for production (where HMR is off).
+      runtimeChunk: isProd ? (true as const) : false,
       sideEffects: true,
       usedExports: (options as any).build?.test?.disableTreeShaking ? false : isProd,
       moduleIds: 'named' as const,
