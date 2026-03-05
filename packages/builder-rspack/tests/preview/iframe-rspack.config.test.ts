@@ -149,7 +149,7 @@ describe('iframe-rspack.config', () => {
     expect(config.entry).toBeDefined();
   });
 
-  it('experiments is empty when lazyCompilation is falsy', async () => {
+  it('lazyCompilation is absent when option is falsy', async () => {
     const createIframeRspackConfig = (
       await import('../../src/preview/iframe-rspack.config')
     ).default;
@@ -161,10 +161,10 @@ describe('iframe-rspack.config', () => {
 
     const config = await createIframeRspackConfig(options);
 
-    expect(config.experiments).toEqual({});
+    expect(config.lazyCompilation).toBeUndefined();
   });
 
-  it('experiments has lazyCompilation when lazyCompilation is truthy', async () => {
+  it('lazyCompilation is set at root level when option is truthy', async () => {
     const createIframeRspackConfig = (
       await import('../../src/preview/iframe-rspack.config')
     ).default;
@@ -176,7 +176,7 @@ describe('iframe-rspack.config', () => {
 
     const config = await createIframeRspackConfig(options);
 
-    expect(config.experiments).toEqual({ lazyCompilation: { entries: false } });
+    expect((config as any).lazyCompilation).toEqual({ entries: false });
   });
 
   it('has cache filesystem config when fsCache is true', async () => {

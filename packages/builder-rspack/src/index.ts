@@ -201,6 +201,12 @@ const starter: StarterFunction = async function* starterGeneratorFn({
     })
   );
 
+  // Lazy compilation middleware must be registered before the dev/hot middleware
+  // so the browser-side proxy modules can request on-demand compilation.
+  if (compiler.options.lazyCompilation) {
+    router.use(rspackModule.lazyCompilationMiddleware(compiler) as any);
+  }
+
   router.use(compilation);
   router.use(webpackHotMiddleware(compiler as any, { log: false }));
 

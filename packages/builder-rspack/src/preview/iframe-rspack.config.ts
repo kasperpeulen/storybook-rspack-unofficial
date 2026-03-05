@@ -347,6 +347,6 @@ export default async (
       hints: isProd ? ('warning' as const) : false,
     },
     ...cacheConfig,
-    experiments: { ...lazyCompilationConfig },
+    ...lazyCompilationConfig,
   } as Configuration;
 };
