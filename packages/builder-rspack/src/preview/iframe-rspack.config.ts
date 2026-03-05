@@ -12,7 +12,6 @@ import type { Options } from 'storybook/internal/types';
 
 import { type BuilderOptions } from '@storybook/core-webpack';
 
-import { dedent } from 'ts-dedent';
 import { rspack as rspackModule } from '@rspack/core';
 import type { Configuration } from '@rspack/core';
 
@@ -20,31 +19,6 @@ import type { TypescriptOptions } from '../types';
 import { getVirtualModules } from './virtual-module-mapping';
 
 const { DefinePlugin, HotModuleReplacementPlugin, ProgressPlugin } = rspackModule;
-
-class IframeHtmlPlugin {
-  constructor(
-    private filename: string,
-    private generate: (files: { css: string[]; js: string[] }) => string
-  ) {}
-
-  apply(compiler: any) {
-    compiler.hooks.compilation.tap('IframeHtmlPlugin', (compilation: any) => {
-      compilation.hooks.processAssets.tap(
-        {
-          name: 'IframeHtmlPlugin',
-          stage: rspackModule.Compilation.PROCESS_ASSETS_STAGE_REPORT,
-        },
-        () => {
-          const assetNames = Object.keys(compilation.assets);
-          const css = assetNames.filter((n) => n.endsWith('.css'));
-          const js = assetNames.filter((n) => n.endsWith('.js') && !n.includes('.hot-update.'));
-          const html = this.generate({ css, js });
-          compilation.emitAsset(this.filename, new rspackModule.sources.RawSource(html));
-        }
-      );
-    });
-  }
-}
 
 export default async (
   options: Options & { typescriptOptions: TypescriptOptions }
@@ -70,7 +44,6 @@ export default async (
     logLevel,
     headHtmlSnippet,
     bodyHtmlSnippet,
-    template,
     docsOptions,
     entries,
     nonNormalizedStories,
@@ -84,7 +57,6 @@ export default async (
     presets.apply('logLevel', undefined),
     presets.apply('previewHead'),
     presets.apply('previewBody'),
-    presets.apply<string>('previewMainTemplate'),
     presets.apply('docs'),
     presets.apply<string[]>('entries', []),
     presets.apply('stories', []),
@@ -107,15 +79,6 @@ export default async (
           lazyCompilation: { entries: false },
         }
       : {};
-
-  if (!template) {
-    throw new Error(dedent`
-      Storybook's Rspack builder requires a template to be specified.
-      Somehow you've ended up with a falsy value for the template option.
-
-      Please file an issue at https://github.com/nicostorybook/storybook-rspack with a reproduction.
-    `);
-  }
 
   const externals: Record<string, string> = globalsNameReferenceMap;
   if ((build as any)?.test?.disableBlocks) {
@@ -163,47 +126,83 @@ export default async (
       Object.keys(virtualModuleMapping).length > 0
         ? new rspackModule.experiments.VirtualModulesPlugin(virtualModuleMapping)
         : (null as any),
-      new IframeHtmlPlugin('iframe.html', ({ css, js }) => {
-        const globals: Record<string, any> = {
-          CONFIG_TYPE: configType,
-          LOGLEVEL: logLevel,
-          FRAMEWORK_OPTIONS: frameworkOptions,
-          CHANNEL_OPTIONS: (coreOptions as any).channelOptions,
-          FEATURES: features,
-          PREVIEW_URL: previewUrl,
-          STORIES: stories.map((specifier: any) => ({
-            ...specifier,
-            importPathMatcher: specifier.importPathMatcher.source,
-          })),
-          DOCS_OPTIONS: docsOptions,
-          TAGS_OPTIONS: tagsOptions,
-          ...((build as any)?.test?.disableBlocks
-            ? { __STORYBOOK_BLOCKS_EMPTY_MODULE__: {} }
-            : {}),
-        };
+      new rspackModule.HtmlRspackPlugin({
+        filename: 'iframe.html',
+        chunksSortMode: 'manual' as const,
+        inject: false,
+        templateContent: ({ htmlRspackPlugin }: any) => {
+          const { files } = htmlRspackPlugin;
 
-        const cssLinks = css
-          .map((file) => `<link href="${file}" rel="stylesheet" />`)
-          .join('\n    ');
+          const globals: Record<string, any> = {
+            CONFIG_TYPE: configType,
+            LOGLEVEL: logLevel,
+            FRAMEWORK_OPTIONS: frameworkOptions,
+            CHANNEL_OPTIONS: (coreOptions as any).channelOptions,
+            FEATURES: features,
+            PREVIEW_URL: previewUrl,
+            STORIES: stories.map((specifier: any) => ({
+              ...specifier,
+              importPathMatcher: specifier.importPathMatcher.source,
+            })),
+            DOCS_OPTIONS: docsOptions,
+            TAGS_OPTIONS: tagsOptions,
+            ...((build as any)?.test?.disableBlocks
+              ? { __STORYBOOK_BLOCKS_EMPTY_MODULE__: {} }
+              : {}),
+          };
 
-        const jsImports = js
-          .map((file) => `import './${file}';`)
-          .join('\n      ');
+          const cssLinks = files.css
+            .map((file: string) => `<link href="${file}" rel="stylesheet" />`)
+            .join('\n    ');
 
-        const globalsScript =
-          Object.keys(globals).length > 0
-            ? `<script>\n${Object.entries(globals)
-                .filter(([, v]) => v != null)
-                .map(([k, v]) => `      window['${k}'] = ${JSON.stringify(v)};`)
-                .join('\n')}\n    </script>`
-            : '';
+          const jsImports = files.js
+            .map((file: string) => `import './${file}';`)
+            .join('\n      ');
 
-        return `<!DOCTYPE html>
+          const globalsScript =
+            Object.keys(globals).length > 0
+              ? `<script>\n${Object.entries(globals)
+                  .filter(([, v]) => v != null)
+                  .map(([k, v]) => `      window['${k}'] = ${JSON.stringify(v)};`)
+                  .join('\n')}\n    </script>`
+              : '';
+
+          return `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <title>Storybook</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      @font-face {
+        font-family: 'Nunito Sans';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url('./sb-common-assets/nunito-sans-regular.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'Nunito Sans';
+        font-style: italic;
+        font-weight: 400;
+        font-display: swap;
+        src: url('./sb-common-assets/nunito-sans-italic.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'Nunito Sans';
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: url('./sb-common-assets/nunito-sans-bold.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'Nunito Sans';
+        font-style: italic;
+        font-weight: 700;
+        font-display: swap;
+        src: url('./sb-common-assets/nunito-sans-bold-italic.woff2') format('woff2');
+      }
+    </style>
     ${headHtmlSnippet || ''}
     ${cssLinks}
     <style>
@@ -224,6 +223,7 @@ export default async (
     </script>
   </body>
 </html>`;
+        },
       }),
       new DefinePlugin({
         'process.env': `(${JSON.stringify(envs)})`,

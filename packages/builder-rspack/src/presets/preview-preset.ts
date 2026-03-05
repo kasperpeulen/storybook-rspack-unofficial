@@ -23,6 +23,3 @@ export const entries = async (_: unknown, options: any) => {
 
   return result;
 };
-
-export const previewMainTemplate = () =>
-  fileURLToPath(import.meta.resolve('storybook-builder-rspack/templates/preview.ejs'));
