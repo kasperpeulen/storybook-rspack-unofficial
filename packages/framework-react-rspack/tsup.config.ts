@@ -7,6 +7,7 @@ export default defineConfig({
   outDir: 'dist',
   clean: true,
   external: [
+    '@rollup/pluginutils',
     '@rspack/core',
     'storybook',
     'storybook/internal/types',

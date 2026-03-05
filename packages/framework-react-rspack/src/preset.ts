@@ -2,6 +2,7 @@ import { fileURLToPath } from 'node:url';
 
 import type { PresetProperty } from 'storybook/internal/types';
 import type { Configuration } from '@rspack/core';
+import { ReactDocgenTypescriptPlugin } from './plugins/react-docgen-typescript';
 
 export const core: PresetProperty<'core'> = async (config, options) => {
   const framework = await options.presets.apply('framework');
@@ -38,26 +39,39 @@ export const rspackFinal = async (config: Configuration, options: any): Promise<
             test: /\.(cjs|mjs|jsx?)$/,
             enforce: 'pre' as const,
             loader: fileURLToPath(
-              import.meta.resolve('storybook-react-rspack/loaders/react-docgen-loader')
+              import.meta.resolve('storybook-react-rspack/loaders/react-docgen-loader'),
             ),
             options: { debug },
             exclude: /(\.(stories|story)\.(js|jsx|ts|tsx))|(node_modules)/,
           },
-          // react-docgen-typescript loader for TS/TSX files
+          // Thin loader — reads handler stored on compiler by ReactDocgenTypescriptPlugin
           {
             test: /\.tsx?$/,
             enforce: 'pre' as const,
             loader: fileURLToPath(
-              import.meta.resolve('storybook-react-rspack/loaders/react-docgen-typescript-loader')
+              import.meta.resolve(
+                'storybook-react-rspack/loaders/react-docgen-typescript-loader',
+              ),
             ),
-            options: {
-              savePropValueAsString: true,
-              ...reactDocgenTypescriptOptions,
-            },
             exclude: /(\.(stories|story)\.(ts|tsx))|(node_modules)/,
           },
         ],
       },
+      plugins: [
+        ...(config.plugins ?? []),
+        new ReactDocgenTypescriptPlugin({
+          savePropValueAsString: true,
+          ...reactDocgenTypescriptOptions,
+          exclude: [
+            '**/node_modules/**',
+            '**/*.stories.ts',
+            '**/*.stories.tsx',
+            '**/*.story.ts',
+            '**/*.story.tsx',
+            ...(reactDocgenTypescriptOptions?.exclude ?? []),
+          ],
+        }),
+      ],
     };
   }
 
@@ -72,7 +86,7 @@ export const rspackFinal = async (config: Configuration, options: any): Promise<
           test: /\.(cjs|mjs|tsx?|jsx?)$/,
           enforce: 'pre' as const,
           loader: fileURLToPath(
-            import.meta.resolve('storybook-react-rspack/loaders/react-docgen-loader')
+            import.meta.resolve('storybook-react-rspack/loaders/react-docgen-loader'),
           ),
           options: { debug },
           exclude: /(\.(stories|story)\.(js|jsx|ts|tsx))|(node_modules)/,
