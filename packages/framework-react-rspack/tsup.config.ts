@@ -1,11 +1,8 @@
 import { defineConfig } from 'tsup';
 
-export default defineConfig({
-  entry: ['src/index.ts', 'src/preset.ts', 'src/loaders/react-docgen-loader.ts', 'src/loaders/react-docgen-typescript-loader.ts'],
-  format: ['esm'],
-  dts: true,
+const shared = {
+  format: ['esm'] as const,
   outDir: 'dist',
-  clean: true,
   external: [
     '@rollup/pluginutils',
     '@rspack/core',
@@ -25,4 +22,19 @@ export default defineConfig({
     'resolve',
   ],
   splitting: false,
-});
+};
+
+export default defineConfig([
+  {
+    ...shared,
+    entry: ['src/index.ts', 'src/preset.ts', 'src/loaders/react-docgen-loader.ts', 'src/loaders/react-docgen-typescript-loader.ts'],
+    dts: true,
+    clean: true,
+  },
+  {
+    ...shared,
+    entry: { 'plugins/react-docgen-typescript-worker': 'src/plugins/react-docgen-typescript-worker.ts' },
+    dts: false,
+    clean: false,
+  },
+]);

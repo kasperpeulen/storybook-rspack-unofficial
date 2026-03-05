@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it } from 'vitest';
 import { ReactDocgenTypescriptPlugin } from '../../plugins/react-docgen-typescript';
 
 const fixturesPath = resolve(import.meta.dirname, '__fixtures__');
@@ -14,11 +14,16 @@ const fixtureTests = readdirSync(fixturesPath)
 
 const HANDLER_KEY = '__reactDocgenHandler';
 
+let shutdownFn: (() => Promise<void>) | undefined;
+
 function createMockCompiler() {
   const compiler: any = {
     hooks: {
-      shutdown: { tapPromise: () => {} },
-      beforeCompile: { tap: () => {} },
+      shutdown: {
+        tapPromise: (_name: string, fn: () => Promise<void>) => {
+          shutdownFn = fn;
+        },
+      },
     },
     context: fixturesPath,
   };
@@ -37,11 +42,15 @@ describe.runIf(isUnix)('react-docgen-typescript-loader', () => {
   const handler = compiler[HANDLER_KEY] as (
     resourcePath: string,
     source: string,
-  ) => { code: string; map: any } | null;
+  ) => Promise<{ code: string; map: any } | null>;
+
+  afterAll(async () => {
+    if (shutdownFn) await shutdownFn();
+  });
 
   for (const fixture of fixtureTests) {
-    it(`${basename(fixture.id)} has docgen code generated`, () => {
-      const result = handler(fixture.id, fixture.code);
+    it(`${basename(fixture.id)} has docgen code generated`, async () => {
+      const result = await handler(fixture.id, fixture.code);
 
       if (result) {
         const appendedCode = result.code.slice(fixture.code.length);

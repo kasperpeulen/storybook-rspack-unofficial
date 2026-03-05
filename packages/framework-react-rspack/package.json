@@ -21,6 +21,7 @@
     },
     "./loaders/react-docgen-loader": "./dist/loaders/react-docgen-loader.js",
     "./loaders/react-docgen-typescript-loader": "./dist/loaders/react-docgen-typescript-loader.js",
+    "./plugins/react-docgen-typescript-worker": "./dist/plugins/react-docgen-typescript-worker.js",
     "./package.json": "./package.json"
   },
   "files": [

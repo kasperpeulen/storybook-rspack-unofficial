@@ -1,10 +1,11 @@
 import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
+import { Worker } from 'node:worker_threads';
 import { createFilter } from '@rollup/pluginutils';
-import * as docGen from 'react-docgen-typescript';
-import ts from 'typescript';
+import type * as docGen from 'react-docgen-typescript';
+import type ts from 'typescript';
 import type { Compiler } from '@rspack/core';
 import { logger } from 'storybook/internal/node-logger';
-import { generateDocgenCodeBlock, type GeneratorOptions } from './generateDocgenCodeBlock';
 
 const require = createRequire(import.meta.url);
 
@@ -19,42 +20,6 @@ export type PluginOptions = docGen.ParserOptions & {
 
 const PLUGIN_NAME = 'ReactDocgenTypescriptPlugin';
 const HANDLER_KEY = '__reactDocgenHandler';
-const VALID_IDENTIFIER = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
-
-function createProjectService() {
-  const tsserver = require('typescript/lib/tsserverlibrary') as {
-    server: { ProjectService: new (opts: any) => any };
-  };
-
-  return new tsserver.server.ProjectService({
-    host: {
-      ...ts.sys,
-      watchFile: () => ({ close: () => {} }),
-      watchDirectory: () => ({ close: () => {} }),
-    },
-    cancellationToken: { isCancellationRequested: () => false },
-    useSingleInferredProject: false,
-    useInferredProjectPerProjectRoot: true,
-    typingsInstaller: {
-      enqueueInstallTypingsRequest: () => {},
-      attach: () => {},
-      onProjectClosed: () => {},
-      globalTypingsCacheLocation: undefined,
-    },
-    logger: {
-      close: () => {},
-      hasLevel: () => false,
-      loggingEnabled: () => false,
-      perftrc: () => {},
-      info: () => {},
-      startGroup: () => {},
-      endGroup: () => {},
-      msg: () => {},
-      getLogFileName: () => undefined,
-    },
-    session: undefined,
-  });
-}
 
 export class ReactDocgenTypescriptPlugin {
   private options: PluginOptions;
@@ -74,75 +39,93 @@ export class ReactDocgenTypescriptPlugin {
       ...docgenOptions
     } = this.options;
 
-    const compilerOptions: ts.CompilerOptions = {
-      jsx: ts.JsxEmit.React,
-      module: ts.ModuleKind.CommonJS,
-      target: ts.ScriptTarget.Latest,
-      ...userCompilerOptions,
-    };
+    const filter = createFilter(include, exclude.length ? exclude : undefined);
 
-    const docGenParser = docGen.withCompilerOptions(compilerOptions, {
-      shouldExtractLiteralValuesFromEnum: true,
-      shouldRemoveUndefinedFromOptional: true,
-      ...docgenOptions,
+    // Resolve worker path via package exports
+    let workerPath: string;
+    try {
+      workerPath = fileURLToPath(
+        import.meta.resolve('storybook-react-rspack/plugins/react-docgen-typescript-worker')
+      );
+    } catch {
+      workerPath = require.resolve('storybook-react-rspack/plugins/react-docgen-typescript-worker');
+    }
+
+    const worker = new Worker(workerPath);
+
+    // Track pending requests
+    let nextId = 0;
+    const pending = new Map<number, { resolve: (v: { code: string; map: any } | null) => void; reject: (e: Error) => void }>();
+    let ready = false;
+    const queue: Array<{ id: number; resourcePath: string; source: string }> = [];
+
+    worker.on('message', (msg: any) => {
+      switch (msg.type) {
+        case 'ready':
+          ready = true;
+          for (const queued of queue) {
+            worker.postMessage({ type: 'process', ...queued });
+          }
+          queue.length = 0;
+          break;
+
+        case 'result': {
+          const entry = pending.get(msg.id);
+          if (entry) {
+            pending.delete(msg.id);
+            entry.resolve(msg.result);
+          }
+          break;
+        }
+
+        case 'log':
+          if (msg.level === 'warn') {
+            logger.warn(`${PLUGIN_NAME}: ${msg.message}`);
+          } else {
+            logger.info(`${PLUGIN_NAME}: ${msg.message}`);
+          }
+          break;
+      }
     });
 
-    const filter = createFilter(include, exclude.length ? exclude : undefined);
-    const generateOptions: Pick<GeneratorOptions, 'setDisplayName' | 'typePropName'> = {
-      setDisplayName,
-      typePropName,
-    };
-
-    let projectService: any = createProjectService();
-
-    const getProgram = (resourcePath: string, source: string): ts.Program => {
-      projectService.openClientFile(resourcePath, source);
-
-      const scriptInfo = projectService.getScriptInfo(resourcePath);
-      if (!scriptInfo) {
-        throw new Error(`${PLUGIN_NAME}: no script info for ${resourcePath}`);
+    worker.on('error', (err) => {
+      logger.error(`${PLUGIN_NAME}: worker error: ${err}`);
+      for (const entry of pending.values()) {
+        entry.reject(err);
       }
+      pending.clear();
+    });
 
-      // Update content only when it changed (avoids version bump → program rebuild)
-      const snapshot = scriptInfo.getSnapshot();
-      if (snapshot.getText(0, snapshot.getLength()) !== source) {
-        scriptInfo.editContent(0, snapshot.getLength(), source);
+    worker.on('exit', (code) => {
+      if (code !== 0) {
+        const err = new Error(`${PLUGIN_NAME}: worker exited with code ${code}`);
+        for (const entry of pending.values()) {
+          entry.reject(err);
+        }
+        pending.clear();
       }
+    });
 
-      const project = projectService.getDefaultProjectForFile(scriptInfo.fileName, true);
-      if (!project) {
-        throw new Error(`${PLUGIN_NAME}: no project for ${resourcePath}`);
-      }
+    // Strip non-serializable (function) values — propFilter, componentNameResolver
+    // cannot be cloned across worker threads
+    const serializableDocgenOptions = Object.fromEntries(
+      Object.entries(docgenOptions).filter(([, v]) => typeof v !== 'function')
+    );
 
-      const program = project.getLanguageService(true)?.getProgram();
-      if (!program) {
-        throw new Error(`${PLUGIN_NAME}: failed to get program for ${resourcePath}`);
-      }
-
-      return program;
-    };
+    worker.postMessage({
+      type: 'init',
+      options: {
+        compilerOptions: userCompilerOptions,
+        setDisplayName,
+        typePropName,
+        docgenOptions: serializableDocgenOptions,
+        compilerContext: warmup ? compiler.context : undefined,
+      },
+    });
 
     compiler.hooks.shutdown.tapPromise(PLUGIN_NAME, async () => {
-      projectService = null;
-    });
-
-    // Warm up the type checker before first compilation (handles cached restarts)
-    let warmedUp = false;
-    compiler.hooks.beforeCompile.tap(PLUGIN_NAME, () => {
-      if (warmedUp || !warmup || !projectService) return;
-      warmedUp = true;
-
-      try {
-        const files = ts.sys.readDirectory(compiler.context, ['.tsx'], ['node_modules']);
-        const seedFile = files.find((f) => filter(f));
-        if (!seedFile || !projectService) return;
-        logger.info(`${PLUGIN_NAME}: warming up TypeScript type checker...`);
-        const start = performance.now();
-        getProgram(seedFile, ts.sys.readFile(seedFile) ?? '');
-        logger.info(`${PLUGIN_NAME}: type checker ready in ${((performance.now() - start) / 1000).toFixed(1)}s`);
-      } catch (e) {
-        logger.warn(`${PLUGIN_NAME}: type checker warmup failed: ${e}`);
-      }
+      worker.postMessage({ type: 'shutdown' });
+      await worker.terminate();
     });
 
     const seenSources = new Map<string, string>();
@@ -150,8 +133,8 @@ export class ReactDocgenTypescriptPlugin {
     (compiler as any)[HANDLER_KEY] = (
       resourcePath: string,
       source: string,
-    ): { code: string; map: any } | null => {
-      if (!filter(resourcePath)) return null;
+    ): Promise<{ code: string; map: any } | null> => {
+      if (!filter(resourcePath)) return Promise.resolve(null);
 
       const prev = seenSources.get(resourcePath);
       if (prev === undefined) {
@@ -163,25 +146,16 @@ export class ReactDocgenTypescriptPlugin {
       }
       seenSources.set(resourcePath, source);
 
-      try {
-        const program = getProgram(resourcePath, source);
-        const componentDocs = docGenParser
-          .parseWithProgramProvider(resourcePath, () => program)
-          .filter((doc) => VALID_IDENTIFIER.test(doc.displayName));
-
-        if (componentDocs.length) {
-          return generateDocgenCodeBlock({
-            filename: resourcePath,
-            source,
-            componentDocs,
-            ...generateOptions,
-          });
+      const id = nextId++;
+      return new Promise((resolve, reject) => {
+        pending.set(id, { resolve, reject });
+        const msg = { id, resourcePath, source };
+        if (ready) {
+          worker.postMessage({ type: 'process', ...msg });
+        } else {
+          queue.push(msg);
         }
-      } catch {
-        // silently skip docgen on error
-      }
-
-      return null;
+      });
     };
   }
 }
