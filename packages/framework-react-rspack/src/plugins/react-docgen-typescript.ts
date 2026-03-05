@@ -92,12 +92,18 @@ export class ReactDocgenTypescriptPlugin {
 
     let projectService: any = createProjectService();
 
-    const getProgram = (resourcePath: string): ts.Program => {
-      projectService.openClientFile(resourcePath);
+    const getProgram = (resourcePath: string, source: string): ts.Program => {
+      projectService.openClientFile(resourcePath, source);
 
       const scriptInfo = projectService.getScriptInfo(resourcePath);
       if (!scriptInfo) {
         throw new Error(`${PLUGIN_NAME}: no script info for ${resourcePath}`);
+      }
+
+      // Update content only when it changed (avoids version bump → program rebuild)
+      const snapshot = scriptInfo.getSnapshot();
+      if (snapshot.getText(0, snapshot.getLength()) !== source) {
+        scriptInfo.editContent(0, snapshot.getLength(), source);
       }
 
       const project = projectService.getDefaultProjectForFile(scriptInfo.fileName, true);
@@ -124,7 +130,7 @@ export class ReactDocgenTypescriptPlugin {
       if (!filter(resourcePath)) return null;
 
       try {
-        const program = getProgram(resourcePath);
+        const program = getProgram(resourcePath, source);
         const componentDocs = docGenParser
           .parseWithProgramProvider(resourcePath, () => program)
           .filter((doc) => VALID_IDENTIFIER.test(doc.displayName));
