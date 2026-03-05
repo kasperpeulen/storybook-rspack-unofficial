@@ -15,7 +15,6 @@ export type PluginOptions = docGen.ParserOptions & {
   include?: string[];
   setDisplayName?: boolean;
   typePropName?: string;
-  warmup?: boolean;
 };
 
 const PLUGIN_NAME = 'ReactDocgenTypescriptPlugin';
@@ -35,7 +34,6 @@ export class ReactDocgenTypescriptPlugin {
       typePropName = 'type',
       exclude = [],
       include = ['**/*.tsx'],
-      warmup = false,
       ...docgenOptions
     } = this.options;
 
@@ -119,7 +117,7 @@ export class ReactDocgenTypescriptPlugin {
         setDisplayName,
         typePropName,
         docgenOptions: serializableDocgenOptions,
-        compilerContext: warmup ? compiler.context : undefined,
+        compilerContext: compiler.context,
       },
     });
 

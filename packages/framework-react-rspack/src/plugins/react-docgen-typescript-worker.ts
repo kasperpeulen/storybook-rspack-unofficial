@@ -136,7 +136,7 @@ parentPort!.on('message', (msg: any) => {
             parentPort!.postMessage({
               type: 'log',
               level: 'info',
-              message: `type checker ready in ${((performance.now() - start) / 1000).toFixed(1)}s`,
+              message: `warming up completed. Type checker ready in ${((performance.now() - start) / 1000).toFixed(1)}s`,
             });
           }
         } catch (e) {
