@@ -145,11 +145,23 @@ export class ReactDocgenTypescriptPlugin {
       }
     });
 
+    const seenSources = new Map<string, string>();
+
     (compiler as any)[HANDLER_KEY] = (
       resourcePath: string,
       source: string,
     ): { code: string; map: any } | null => {
       if (!filter(resourcePath)) return null;
+
+      const prev = seenSources.get(resourcePath);
+      if (prev === undefined) {
+        logger.info(`${PLUGIN_NAME}: [handler] new file: ${resourcePath}`);
+      } else if (prev === source) {
+        logger.info(`${PLUGIN_NAME}: [handler] unchanged file: ${resourcePath}`);
+      } else {
+        logger.info(`${PLUGIN_NAME}: [handler] changed file: ${resourcePath}`);
+      }
+      seenSources.set(resourcePath, source);
 
       try {
         const program = getProgram(resourcePath, source);
