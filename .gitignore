@@ -2,11 +2,11 @@ node_modules
 dist
 *.tgz
 .DS_Store
-pnpm-lock.yaml
 
 storybook-source
-sotrybook-rsbuild-source
-
+storybook-rsbuild-source
+rsbuild-source
+vite-plugin-react-docgen-typescript-source
 
 storybook-static
 
