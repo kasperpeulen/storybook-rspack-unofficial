@@ -18,7 +18,9 @@ function createMockCompiler() {
   const compiler: any = {
     hooks: {
       shutdown: { tapPromise: () => {} },
+      done: { tap: () => {} },
     },
+    context: fixturesPath,
   };
   return compiler;
 }

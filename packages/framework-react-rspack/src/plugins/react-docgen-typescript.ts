@@ -123,6 +123,22 @@ export class ReactDocgenTypescriptPlugin {
       projectService = null;
     });
 
+    // Warm up the type checker after first compilation (handles cached restarts)
+    let warmedUp = false;
+    compiler.hooks.done.tap(PLUGIN_NAME, () => {
+      if (warmedUp || !projectService) return;
+      warmedUp = true;
+
+      setImmediate(() => {
+        try {
+          const files = ts.sys.readDirectory(compiler.context, ['.tsx'], ['node_modules']);
+          const seedFile = files.find((f) => filter(f));
+          if (!seedFile || !projectService) return;
+          getProgram(seedFile, ts.sys.readFile(seedFile) ?? '');
+        } catch {}
+      });
+    });
+
     (compiler as any)[HANDLER_KEY] = (
       resourcePath: string,
       source: string,
