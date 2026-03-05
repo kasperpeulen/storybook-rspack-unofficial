@@ -3,6 +3,7 @@ import { createFilter } from '@rollup/pluginutils';
 import * as docGen from 'react-docgen-typescript';
 import ts from 'typescript';
 import type { Compiler } from '@rspack/core';
+import { logger } from 'storybook/internal/node-logger';
 import { generateDocgenCodeBlock, type GeneratorOptions } from './generateDocgenCodeBlock';
 
 const require = createRequire(import.meta.url);
@@ -13,6 +14,7 @@ export type PluginOptions = docGen.ParserOptions & {
   include?: string[];
   setDisplayName?: boolean;
   typePropName?: string;
+  warmup?: boolean;
 };
 
 const PLUGIN_NAME = 'ReactDocgenTypescriptPlugin';
@@ -68,6 +70,7 @@ export class ReactDocgenTypescriptPlugin {
       typePropName = 'type',
       exclude = [],
       include = ['**/*.tsx'],
+      warmup = false,
       ...docgenOptions
     } = this.options;
 
@@ -123,20 +126,23 @@ export class ReactDocgenTypescriptPlugin {
       projectService = null;
     });
 
-    // Warm up the type checker after first compilation (handles cached restarts)
+    // Warm up the type checker before first compilation (handles cached restarts)
     let warmedUp = false;
-    compiler.hooks.done.tap(PLUGIN_NAME, () => {
-      if (warmedUp || !projectService) return;
+    compiler.hooks.beforeCompile.tap(PLUGIN_NAME, () => {
+      if (warmedUp || !warmup || !projectService) return;
       warmedUp = true;
 
-      setImmediate(() => {
-        try {
-          const files = ts.sys.readDirectory(compiler.context, ['.tsx'], ['node_modules']);
-          const seedFile = files.find((f) => filter(f));
-          if (!seedFile || !projectService) return;
-          getProgram(seedFile, ts.sys.readFile(seedFile) ?? '');
-        } catch {}
-      });
+      try {
+        const files = ts.sys.readDirectory(compiler.context, ['.tsx'], ['node_modules']);
+        const seedFile = files.find((f) => filter(f));
+        if (!seedFile || !projectService) return;
+        logger.info(`${PLUGIN_NAME}: warming up TypeScript type checker...`);
+        const start = performance.now();
+        getProgram(seedFile, ts.sys.readFile(seedFile) ?? '');
+        logger.info(`${PLUGIN_NAME}: type checker ready in ${((performance.now() - start) / 1000).toFixed(1)}s`);
+      } catch (e) {
+        logger.warn(`${PLUGIN_NAME}: type checker warmup failed: ${e}`);
+      }
     });
 
     (compiler as any)[HANDLER_KEY] = (
