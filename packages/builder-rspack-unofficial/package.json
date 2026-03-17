@@ -1,5 +1,5 @@
 {
-  "name": "storybook-builder-rspack",
+  "name": "storybook-builder-rspack-unofficial",
   "version": "0.1.0",
   "description": "A Storybook builder that uses rspack directly",
   "keywords": [

@@ -121,7 +121,7 @@ export class RspackMockPlugin {
           replacementResource = redirectPath;
         } else {
           const loaderPath = fileURLToPath(
-            import.meta.resolve('storybook-builder-rspack/loaders/rspack-automock-loader')
+            import.meta.resolve('storybook-builder-rspack-unofficial/loaders/rspack-automock-loader')
           );
           replacementResource = `${loaderPath}?spy=${mock.spy}!${absolutePath}`;
         }

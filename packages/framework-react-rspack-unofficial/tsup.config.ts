@@ -10,7 +10,7 @@ const shared = {
     'storybook/internal/types',
     'storybook/internal/common',
     'storybook/internal/node-logger',
-    'storybook-builder-rspack',
+    'storybook-builder-rspack-unofficial',
     'react',
     'react-dom',
     'typescript',

@@ -43,10 +43,10 @@ export class ReactDocgenTypescriptPlugin {
     let workerPath: string;
     try {
       workerPath = fileURLToPath(
-        import.meta.resolve('storybook-react-rspack/plugins/react-docgen-typescript-worker')
+        import.meta.resolve('storybook-react-rspack-unofficial/plugins/react-docgen-typescript-worker')
       );
     } catch {
-      workerPath = require.resolve('storybook-react-rspack/plugins/react-docgen-typescript-worker');
+      workerPath = require.resolve('storybook-react-rspack-unofficial/plugins/react-docgen-typescript-worker');
     }
 
     const worker = new Worker(workerPath);

@@ -345,8 +345,8 @@ export const build = async (options: BuilderStartOptions) => {
 };
 
 export const corePresets = [
-  import.meta.resolve('storybook-builder-rspack/presets/preview-preset'),
+  import.meta.resolve('storybook-builder-rspack-unofficial/presets/preview-preset'),
 ];
 export const overridePresets = [
-  import.meta.resolve('storybook-builder-rspack/presets/custom-rspack-preset'),
+  import.meta.resolve('storybook-builder-rspack-unofficial/presets/custom-rspack-preset'),
 ];

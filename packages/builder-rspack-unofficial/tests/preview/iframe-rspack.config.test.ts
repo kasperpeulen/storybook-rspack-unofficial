@@ -63,7 +63,7 @@ const createOptions = (overrides: Record<string, unknown> = {}) => {
       'core',
       {
         builder: {
-          name: 'storybook-builder-rspack',
+          name: 'storybook-builder-rspack-unofficial',
           options: { fsCache: false, lazyCompilation: false },
         },
       },

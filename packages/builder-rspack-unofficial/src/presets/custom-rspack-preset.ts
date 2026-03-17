@@ -50,7 +50,7 @@ export async function rspackFinal(config: Configuration, options: Options) {
       {
         loader: fileURLToPath(
           import.meta.resolve(
-            'storybook-builder-rspack/loaders/storybook-mock-transform-loader'
+            'storybook-builder-rspack-unofficial/loaders/storybook-mock-transform-loader'
           )
         ),
       },

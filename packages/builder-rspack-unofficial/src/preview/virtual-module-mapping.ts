@@ -51,7 +51,7 @@ export const getVirtualModules = async (options: Options) => {
   virtualModules[configEntryPath] = (
     await readTemplate(
       fileURLToPath(
-        import.meta.resolve('storybook-builder-rspack/templates/virtualModuleModernEntry.js')
+        import.meta.resolve('storybook-builder-rspack-unofficial/templates/virtualModuleModernEntry.js')
       )
     )
   )

@@ -288,7 +288,7 @@ export default async (
           use: [
             {
               loader: fileURLToPath(
-                import.meta.resolve('storybook-builder-rspack/loaders/export-order-loader')
+                import.meta.resolve('storybook-builder-rspack-unofficial/loaders/export-order-loader')
               ),
             },
           ],

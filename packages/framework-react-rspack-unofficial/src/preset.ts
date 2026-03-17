@@ -10,7 +10,7 @@ export const core: PresetProperty<'core'> = async (config, options) => {
   return {
     ...config,
     builder: {
-      name: 'storybook-builder-rspack',
+      name: 'storybook-builder-rspack-unofficial',
       options: (typeof framework === 'object' ? framework?.options?.builder : {}) || {},
     },
     renderer: fileURLToPath(import.meta.resolve('@storybook/react/preset')),
@@ -39,7 +39,7 @@ export const rspackFinal = async (config: Configuration, options: any): Promise<
             test: /\.(cjs|mjs|jsx?)$/,
             enforce: 'pre' as const,
             loader: fileURLToPath(
-              import.meta.resolve('storybook-react-rspack/loaders/react-docgen-loader'),
+              import.meta.resolve('storybook-react-rspack-unofficial/loaders/react-docgen-loader'),
             ),
             options: { debug },
             exclude: /(\.(stories|story)\.(js|jsx|ts|tsx))|(node_modules)/,
@@ -50,7 +50,7 @@ export const rspackFinal = async (config: Configuration, options: any): Promise<
             enforce: 'pre' as const,
             loader: fileURLToPath(
               import.meta.resolve(
-                'storybook-react-rspack/loaders/react-docgen-typescript-loader',
+                'storybook-react-rspack-unofficial/loaders/react-docgen-typescript-loader',
               ),
             ),
             exclude: /(\.(stories|story)\.(ts|tsx))|(node_modules)/,
@@ -86,7 +86,7 @@ export const rspackFinal = async (config: Configuration, options: any): Promise<
           test: /\.(cjs|mjs|tsx?|jsx?)$/,
           enforce: 'pre' as const,
           loader: fileURLToPath(
-            import.meta.resolve('storybook-react-rspack/loaders/react-docgen-loader'),
+            import.meta.resolve('storybook-react-rspack-unofficial/loaders/react-docgen-loader'),
           ),
           options: { debug },
           exclude: /(\.(stories|story)\.(js|jsx|ts|tsx))|(node_modules)/,
