@@ -14,22 +14,22 @@ A [Storybook](https://storybook.js.org/) builder powered by [Rspack](https://rsp
 
 | Package | Description |
 |---|---|
-| [`storybook-builder-rspack`](./packages/builder-rspack) | Rspack builder for Storybook |
-| [`storybook-react-rspack`](./packages/framework-react-rspack) | React framework using the rspack builder |
+| [`storybook-builder-rspack-unofficial`](./packages/builder-rspack-unofficial) | Rspack builder for Storybook |
+| [`storybook-react-rspack-unofficial`](./packages/framework-react-rspack-unofficial) | React framework using the rspack builder |
 
 ## Quick Start
 
 ```bash
-npm install storybook-react-rspack @rspack/core --save-dev
+npm install storybook-react-rspack-unofficial @rspack/core --save-dev
 ```
 
 Configure `.storybook/main.ts`:
 
 ```ts
-import type { StorybookConfig } from 'storybook-react-rspack';
+import type { StorybookConfig } from 'storybook-react-rspack-unofficial';
 
 const config: StorybookConfig = {
-  framework: 'storybook-react-rspack',
+  framework: 'storybook-react-rspack-unofficial',
   stories: ['../src/**/*.stories.@(ts|tsx|js|jsx)'],
 };
 
@@ -49,10 +49,10 @@ npx storybook dev -p 6006
 Use `rspackFinal` in your `.storybook/main.ts` to customize the rspack configuration:
 
 ```ts
-import type { StorybookConfig } from 'storybook-react-rspack';
+import type { StorybookConfig } from 'storybook-react-rspack-unofficial';
 
 const config: StorybookConfig = {
-  framework: 'storybook-react-rspack',
+  framework: 'storybook-react-rspack-unofficial',
   stories: ['../src/**/*.stories.@(ts|tsx|js|jsx)'],
   async rspackFinal(config) {
     config.resolve ??= {};
@@ -72,7 +72,7 @@ export default config;
 ```ts
 const config: StorybookConfig = {
   framework: {
-    name: 'storybook-react-rspack',
+    name: 'storybook-react-rspack-unofficial',
     options: {
       builder: {
         fsCache: true,        // Enable filesystem cache

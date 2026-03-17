@@ -1,4 +1,4 @@
-# storybook-builder-rspack
+# storybook-builder-rspack-unofficial
 
 Storybook builder that uses [`@rspack/core`](https://rspack.dev/) directly — a fast, webpack-compatible bundler.
 
@@ -7,10 +7,10 @@ This is a port of `@storybook/builder-webpack5` for Storybook 10, replacing webp
 ## Installation
 
 ```bash
-npm install storybook-builder-rspack @rspack/core --save-dev
+npm install storybook-builder-rspack-unofficial @rspack/core --save-dev
 ```
 
-Most users should install [`storybook-react-rspack`](../framework-react-rspack) instead, which bundles this builder with the React renderer.
+Most users should install [`storybook-react-rspack-unofficial`](../framework-react-rspack-unofficial) instead, which bundles this builder with the React renderer.
 
 ## What's included
 

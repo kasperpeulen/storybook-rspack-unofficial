@@ -1,13 +1,13 @@
-# storybook-react-rspack
+# storybook-react-rspack-unofficial
 
 Storybook framework for React projects using [Rspack](https://rspack.dev/) as the bundler.
 
-Combines [`storybook-builder-rspack`](../builder-rspack) with `@storybook/react` renderer.
+Combines [`storybook-builder-rspack-unofficial`](../builder-rspack-unofficial) with `@storybook/react` renderer.
 
 ## Installation
 
 ```bash
-npm install storybook-react-rspack @rspack/core --save-dev
+npm install storybook-react-rspack-unofficial @rspack/core --save-dev
 ```
 
 ## Usage
@@ -15,10 +15,10 @@ npm install storybook-react-rspack @rspack/core --save-dev
 `.storybook/main.ts`:
 
 ```ts
-import type { StorybookConfig } from 'storybook-react-rspack';
+import type { StorybookConfig } from 'storybook-react-rspack-unofficial';
 
 const config: StorybookConfig = {
-  framework: 'storybook-react-rspack',
+  framework: 'storybook-react-rspack-unofficial',
   stories: ['../src/**/*.stories.@(ts|tsx|js|jsx)'],
 };
 
