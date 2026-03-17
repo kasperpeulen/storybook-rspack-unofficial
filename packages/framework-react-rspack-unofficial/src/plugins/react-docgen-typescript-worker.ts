@@ -2,7 +2,7 @@ import { createRequire } from 'node:module';
 import { parentPort } from 'node:worker_threads';
 import * as docGen from 'react-docgen-typescript';
 import ts from 'typescript';
-import { generateDocgenCodeBlock } from './generateDocgenCodeBlock';
+import { generateDocgenCodeBlock } from './generateDocgenCodeBlock.js';
 
 const require = createRequire(import.meta.url);
 

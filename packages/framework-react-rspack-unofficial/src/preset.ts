@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url';
 
 import type { PresetProperty } from 'storybook/internal/types';
 import type { Configuration } from '@rspack/core';
-import { ReactDocgenTypescriptPlugin } from './plugins/react-docgen-typescript';
+import { ReactDocgenTypescriptPlugin } from './plugins/react-docgen-typescript.js';
 
 export const core: PresetProperty<'core'> = async (config, options) => {
   const framework = await options.presets.apply('framework');

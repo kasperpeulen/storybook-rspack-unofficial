@@ -13,8 +13,8 @@ import sirv from 'sirv';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 
-export * from './types';
-export * from './preview/virtual-module-mapping';
+export * from './types.js';
+export * from './preview/virtual-module-mapping.js';
 
 const { DefinePlugin, IgnorePlugin, ProgressPlugin } = rspackModule;
 

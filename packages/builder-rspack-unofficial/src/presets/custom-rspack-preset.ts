@@ -10,9 +10,9 @@ import { loadCustomWebpackConfig } from '@storybook/core-webpack';
 import { rspack as rspackModule } from '@rspack/core';
 import type { Configuration } from '@rspack/core';
 
-import { RspackInjectMockerRuntimePlugin } from '../plugins/rspack-inject-mocker-runtime-plugin';
-import { RspackMockPlugin } from '../plugins/rspack-mock-plugin';
-import { createDefaultRspackConfig } from '../preview/base-rspack.config';
+import { RspackInjectMockerRuntimePlugin } from '../plugins/rspack-inject-mocker-runtime-plugin.js';
+import { RspackMockPlugin } from '../plugins/rspack-mock-plugin.js';
+import { createDefaultRspackConfig } from '../preview/base-rspack.config.js';
 
 export const swc: PresetProperty<'swc'> = (config: Record<string, any>): Record<string, any> => {
   return {

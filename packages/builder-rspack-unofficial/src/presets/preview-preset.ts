@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url';
 
-import rspackConfig from '../preview/iframe-rspack.config';
+import rspackConfig from '../preview/iframe-rspack.config.js';
 
 export const rspack = async (_: unknown, options: any) => rspackConfig(options);
 

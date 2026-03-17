@@ -19,7 +19,7 @@ import {
   RESOLVE_EXTENSIONS,
   ReactDocgenResolveError,
   defaultLookupModule,
-} from './docgen-resolver';
+} from './docgen-resolver.js';
 
 const { getNameOrValue, isReactForwardRefCall } = utils;
 

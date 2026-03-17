@@ -15,8 +15,8 @@ import { type BuilderOptions } from '@storybook/core-webpack';
 import { rspack as rspackModule } from '@rspack/core';
 import type { Configuration } from '@rspack/core';
 
-import type { TypescriptOptions } from '../types';
-import { getVirtualModules } from './virtual-module-mapping';
+import type { TypescriptOptions } from '../types.js';
+import { getVirtualModules } from './virtual-module-mapping.js';
 
 const { DefinePlugin, HotModuleReplacementPlugin, ProgressPlugin } = rspackModule;
 
