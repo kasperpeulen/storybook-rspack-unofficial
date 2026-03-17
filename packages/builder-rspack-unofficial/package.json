@@ -9,6 +9,13 @@
     "builder",
     "bundler"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/7rulnik/storybook-rspack-unofficial",
+    "directory": "packages/builder-rspack-unofficial"
+  },
+  "homepage": "https://github.com/7rulnik/storybook-rspack-unofficial#readme",
+  "bugs": "https://github.com/7rulnik/storybook-rspack-unofficial/issues",
   "license": "MIT",
   "type": "module",
   "exports": {
@@ -28,10 +35,8 @@
   "files": [
     "dist/**/*",
     "templates/**/*",
-    "README.md",
-    "*.js",
-    "*.d.ts",
-    "!src/**/*"
+    "LICENSE",
+    "README.md"
   ],
   "scripts": {
     "build": "tsc",
