@@ -3,10 +3,7 @@ dist
 *.tgz
 .DS_Store
 
-storybook-source
-storybook-rsbuild-source
-rsbuild-source
-vite-plugin-react-docgen-typescript-source
+references/
 
 storybook-static
 
