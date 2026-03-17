@@ -50,9 +50,6 @@ importers:
       style-loader:
         specifier: ^4.0.0
         version: 4.0.0(webpack@5.105.2)
-      ts-dedent:
-        specifier: ^2.2.0
-        version: 2.2.0
       webpack-dev-middleware:
         specifier: ^7.4.5
         version: 7.4.5(tslib@2.8.1)(webpack@5.105.2)
@@ -149,9 +146,6 @@ importers:
       storybook:
         specifier: ^10.2.19
         version: 10.2.19(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      storybook-builder-rspack-unofficial:
-        specifier: workspace:*
-        version: link:../packages/builder-rspack-unofficial
       storybook-react-rspack-unofficial:
         specifier: workspace:*
         version: link:../packages/framework-react-rspack-unofficial
