@@ -1,7 +1,7 @@
-import type { StorybookConfig } from 'storybook-react-rspack';
+import type { StorybookConfig } from 'storybook-react-rspack-unofficial';
 
 const config: StorybookConfig = {
-  framework: 'storybook-react-rspack',
+  framework: 'storybook-react-rspack-unofficial',
   typescript: {
     reactDocgen: 'react-docgen-typescript',
   },

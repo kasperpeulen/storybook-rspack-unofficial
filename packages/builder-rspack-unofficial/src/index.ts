@@ -73,7 +73,7 @@ type BuilderFunction = (
 ) => AsyncGenerator<Stats | undefined, BuilderBuildResult, void>;
 
 export const executor = {
-  get: async (options: Options) => {
+  get: async (options: Options): Promise<typeof rspackModule> => {
     const rspackInstance =
       (await options.presets.apply<typeof rspackModule>('rspackInstance')) || rspackModule;
     return rspackInstance;

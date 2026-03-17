@@ -34,7 +34,7 @@
     "!src/**/*"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsc -p tsconfig.build.json",
     "clean": "rm -rf dist"
   },
   "dependencies": {
@@ -57,7 +57,7 @@
     "@types/node": "^22.0.0",
     "@types/pretty-hrtime": "^1.0.0",
     "@types/webpack-hot-middleware": "^2.25.6",
-    "tsup": "^8.0.0",
+
     "typescript": "^5.7.0"
   },
   "peerDependencies": {

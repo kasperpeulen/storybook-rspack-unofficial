@@ -135,4 +135,4 @@ export async function rspack(config: Configuration, options: Options) {
   return finalDefaultConfig;
 }
 
-export const rspackInstance = async () => rspackModule;
+export const rspackInstance = async (): Promise<typeof rspackModule> => rspackModule;

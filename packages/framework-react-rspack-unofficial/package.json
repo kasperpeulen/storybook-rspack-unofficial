@@ -32,7 +32,7 @@
     "!src/**/*"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsc -p tsconfig.build.json",
     "clean": "rm -rf dist"
   },
   "dependencies": {
@@ -51,7 +51,7 @@
     "@types/react": "^19.0.0",
     "@types/resolve": "^1.20.6",
     "react": "^19.0.0",
-    "tsup": "^8.0.0",
+
     "typescript": "^5.7.0"
   },
   "peerDependencies": {
