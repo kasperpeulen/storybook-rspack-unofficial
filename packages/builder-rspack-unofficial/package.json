@@ -34,7 +34,7 @@
     "!src/**/*"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc",
     "clean": "rm -rf dist"
   },
   "dependencies": {
