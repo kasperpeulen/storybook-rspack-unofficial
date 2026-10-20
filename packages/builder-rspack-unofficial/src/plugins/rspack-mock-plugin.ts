@@ -2,7 +2,6 @@ import { dirname, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
-  babelParser,
   extractMockCalls,
   findMockRedirect,
   getIsExternal,
@@ -105,7 +104,6 @@ export class RspackMockPlugin {
 
     const mocks = extractMockCalls(
       { previewConfigPath, configDir: dirname(previewConfigPath) },
-      babelParser,
       compiler.context,
       findMockRedirect
     );

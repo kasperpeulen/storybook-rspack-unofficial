@@ -110,7 +110,6 @@ const createOptions = (overrides: Record<string, unknown> = {}) => {
     outputDir: 'storybook-static',
     packageJson: { version: '10.0.0-test' },
     presets: { apply },
-    previewUrl: 'http://localhost:6006/iframe.html',
     typescriptOptions: {
       check: false,
       skipCompiler: true,
