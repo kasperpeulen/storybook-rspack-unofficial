@@ -2,7 +2,6 @@ import { dirname, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
-  extractMockCalls,
   findMockRedirect,
   getIsExternal,
   resolveExternalModule,
@@ -11,6 +10,8 @@ import {
 
 import type { Compiler } from '@rspack/core';
 import { rspack } from '@rspack/core';
+
+import { extractMockCalls } from '../mocking-utils.js';
 
 // --- Type Definitions ---
 

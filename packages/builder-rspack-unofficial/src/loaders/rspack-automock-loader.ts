@@ -1,6 +1,6 @@
-import { getAutomockCode } from 'storybook/internal/mocking-utils';
-
 import type { LoaderContext } from '@rspack/core';
+
+import { getAutomockCode } from '../mocking-utils.js';
 
 /** Defines the options that can be passed to the rspack-automock-loader. */
 interface AutomockLoaderOptions {

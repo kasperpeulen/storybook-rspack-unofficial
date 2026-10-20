@@ -32,6 +32,8 @@ export default async (
     typescriptOptions,
     features,
   } = options;
+  // Storybook 11 drops `--preview-url` and this option with it (storybookjs/storybook#36451).
+  const { previewUrl } = options as { previewUrl?: string };
 
   const isProd = configType === 'PRODUCTION';
   const workingDir = process.cwd();
@@ -138,6 +140,7 @@ export default async (
             FRAMEWORK_OPTIONS: frameworkOptions,
             CHANNEL_OPTIONS: (coreOptions as any).channelOptions,
             FEATURES: features,
+            PREVIEW_URL: previewUrl,
             STORIES: stories.map((specifier: any) => ({
               ...specifier,
               importPathMatcher: specifier.importPathMatcher.source,
