@@ -1,10 +1,10 @@
-import { mkdtempSync, realpathSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import * as installedMockingUtils from 'storybook/internal/mocking-utils';
 import { findMockRedirect } from 'storybook/internal/mocking-utils';
-import { describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it } from 'vitest';
 
 import {
   extractMockCalls,
@@ -12,14 +12,18 @@ import {
   rewriteSbMockImportCalls,
 } from '../src/mocking-utils';
 
-// Storybook 10's mocking-utils export `babelParser`; Storybook 11's do not.
-const installed = 'babelParser' in installedMockingUtils ? 10 : 11;
-const suiteName = (version: number) =>
-  installed === version
-    ? `mocking-utils on Storybook ${version}`
-    : `mocking-utils on Storybook ${version} (skipped: Storybook ${installed} is installed)`;
+// `extractMockCalls` reports its use; keep the tests out of Storybook's telemetry.
+process.env.STORYBOOK_DISABLE_TELEMETRY = '1';
+
+// Storybook 10's mocking-utils export `babelParser`, and Storybook 11's since
+// storybookjs/storybook#36613 do not. Each suite runs on the one it is written for.
+const takesBabelParser = 'babelParser' in installedMockingUtils;
+const storybook10 = 'Storybook 10 mocking-utils, which export babelParser';
+const storybook11 = 'Storybook 11 mocking-utils, which parse with oxc';
+const skipped = ' (skipped: the installed mocking-utils are the others)';
 
 const dir = realpathSync(mkdtempSync(join(tmpdir(), 'rspack-mocking-utils-')));
+afterAll(() => rmSync(dir, { recursive: true, force: true }));
 const greeting = join(dir, 'greeting.ts');
 const preview = join(dir, 'preview.ts');
 writeFileSync(greeting, "export function greet(name: string) { return 'hi ' + name; }\n");
@@ -40,7 +44,8 @@ const sharedTests = () => {
   });
 
   it('extracts the mock calls of the preview file', () => {
-    const calls = extractMockCalls({ previewConfigPath: preview, configDir: dir }, dir, findMockRedirect);
+    const options = { previewConfigPath: preview, configDir: dir };
+    const calls = extractMockCalls(options, dir, findMockRedirect);
     expect(calls).toEqual([
       { path: './greeting', absolutePath: greeting, redirectPath: null, spy: true },
     ]);
@@ -52,7 +57,7 @@ const sharedTests = () => {
   });
 };
 
-describe.runIf(installed === 10)(suiteName(10), () => {
+describe.runIf(takesBabelParser)(storybook10 + (takesBabelParser ? '' : skipped), () => {
   sharedTests();
 
   it('hands on no source map, as Babel reprints the module', () => {
@@ -61,7 +66,7 @@ describe.runIf(installed === 10)(suiteName(10), () => {
   });
 });
 
-describe.runIf(installed === 11)(suiteName(11), () => {
+describe.runIf(!takesBabelParser)(storybook11 + (takesBabelParser ? skipped : ''), () => {
   sharedTests();
 
   it("hands on the rewrite's source map, for the module", () => {
@@ -71,9 +76,8 @@ describe.runIf(installed === 11)(suiteName(11), () => {
 
   it('hands on the incoming source map when nothing is rewritten', () => {
     const code = 'let a = 1;\n';
-    expect(rewriteSbMockImportCalls(code, preview, incomingMap)).toEqual({
-      code,
-      map: incomingMap,
-    });
+    const result = rewriteSbMockImportCalls(code, preview, incomingMap);
+    expect(result.code).toBe(code);
+    expect(result.map).toBe(incomingMap);
   });
 });
