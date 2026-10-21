@@ -11,5 +11,13 @@
   "devDependencies": {
     "path-serializer": "^0.6.0",
     "vitest": "^4.1.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "storybook": "https://pkg.pr.new/storybook@b26f35e1aff",
+      "@storybook/addon-docs": "https://pkg.pr.new/@storybook/addon-docs@b26f35e1aff",
+      "@storybook/core-webpack": "https://pkg.pr.new/@storybook/core-webpack@b26f35e1aff",
+      "@storybook/react": "https://pkg.pr.new/@storybook/react@b26f35e1aff"
+    }
   }
 }
